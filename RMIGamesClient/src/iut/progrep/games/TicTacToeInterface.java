@@ -1,4 +1,4 @@
-package iut.progrep.games.rmi;
+package iut.progrep.games;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
