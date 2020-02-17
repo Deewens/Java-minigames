@@ -121,5 +121,7 @@ public class TicTacToe {
 		this.joueurActuel = joueurActuel;
 	}
 	
-	
+	public char getSymbole() {
+		return symbole;
+	}
 }
