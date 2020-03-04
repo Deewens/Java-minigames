@@ -12,12 +12,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 
 public class TicTacToeController implements Initializable {
 	@FXML private GridPane grille;
@@ -95,13 +97,14 @@ public class TicTacToeController implements Initializable {
 				p.getChildren().add(cercle);
 			}
 			else if(this.tictactoe.getSymbole() == 'X') {
-				Circle cercle = new Circle(0, 0, 50);
-				cercle.setFill(Color.RED);
-				cercle.setStroke(Color.BLACK);
-				cercle.setStrokeWidth(5);
-				cercle.setLayoutX(p.getWidth()/2);
-				cercle.setLayoutY(p.getHeight()/2);
-				p.getChildren().add(cercle);
+				/*Line line1 = new Line(10, 10, 100, 50);
+				Line line2 = new Line(p.getHeight(), p.getHeight(), 100, 50);
+				line1.setStrokeWidth(5);
+				line2.setStrokeWidth(5);*/
+				
+				Line line1 = new Line(10, 10, 10, 10);
+				line1.endXProperty().bind(line1.widthProperty().subtract(10));
+				p.getChildren().addAll(line1, line2);
 			}
 			
 			this.tictactoe.ajouterSymbole(GridPane.getRowIndex(p), GridPane.getColumnIndex(p));

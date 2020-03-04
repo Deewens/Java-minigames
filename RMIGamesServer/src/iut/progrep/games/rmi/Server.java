@@ -4,7 +4,6 @@ import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
-import iut.progrep.games.Matches;
 import iut.progrep.games.TicTacToe;
 import iut.progrep.games.TicTacToeImpl;
 
