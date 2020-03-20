@@ -3,49 +3,43 @@ package iut.progrep.games;
 import java.util.Arrays;
 
 import iut.progrep.games.pojo.Joueur;
+import iut.progrep.games.pojo.JoueurTicTacToe;
 
 public class TicTacToe {
 	private char[][] grille;
-	private char symbole;
-	private Joueur joueurActuel;
-	private Joueur j1;
-	private Joueur j2;
+	private JoueurTicTacToe joueurActuel; // Tour du joueur
+	private JoueurTicTacToe j1;
+	private JoueurTicTacToe j2;
 	
-	
-	public TicTacToe(Joueur j1, Joueur j2) {
+	public TicTacToe(JoueurTicTacToe j1, JoueurTicTacToe j2) {
 		this.j1 = j1;
 		this.j2 = j2;
 		
-		this.joueurActuel = j1;
-		this.grille = new char[][] {{' ', ' ', ' '},{' ',' ',' '},{' ',' ',' '}};
-		this.symbole = 'X';
-		System.out.println("Jeu initialisé.");
+		this.grille = new char[][] {{' ',' ',' '},{' ',' ',' '},{' ',' ',' '}};
+		
+		System.out.println("TicTacToe initialisé.");
 		System.out.println("C'est à " + this.joueurActuel.getPseudo() + " de joué.");
 	}
 	
 	public boolean ajouterSymbole(int ligne, int colonne) {
 		if(this.grille[ligne][colonne] == ' ') {
-			this.grille[ligne][colonne] = symbole;
+			this.grille[ligne][colonne] = this.joueurActuel.getSymbole();
 			return true;
 		}
 		return false;
 	}
 	
-	
 	public void changerJoueur() {
-		if(this.symbole == 'X') {
-			this.symbole = 'O';
-			this.joueurActuel = j2;
+		if(this.joueurActuel.equals(this.j1)) {
+			this.joueurActuel = this.j2;
 		}
 		else {
-			this.symbole = 'X';
-			this.joueurActuel = j1;
+			this.joueurActuel = this.j1;
 		}
 	}
 	
-	public void afficherGrille() {
+	public void afficherGrilleCmd() {
 		System.out.println("-------------");
-		
 		for(int i = 0; i<this.grille.length;i++) {
 			System.out.print("| ");
 			for(int j = 0; j<this.grille[i].length;j++) {
@@ -55,6 +49,10 @@ public class TicTacToe {
 		}
 		System.out.println("-------------");
 		
+	}
+	
+	public char[][] getGrille() {
+		return grille;
 	}
 	
 	private boolean verifSymbole(char c1, char c2, char c3) {
@@ -115,13 +113,5 @@ public class TicTacToe {
 
 	public Joueur getJoueurActuel() {
 		return joueurActuel;
-	}
-
-	public void setJoueurActuel(Joueur joueurActuel) {
-		this.joueurActuel = joueurActuel;
-	}
-	
-	public char getSymbole() {
-		return symbole;
 	}
 }

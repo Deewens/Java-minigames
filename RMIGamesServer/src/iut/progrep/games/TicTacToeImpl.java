@@ -8,71 +8,36 @@ import iut.progrep.games.rmi.TicTacToeInterface;
 
 public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInterface {
 	private TicTacToe jeu;
-	private Joueur j1;
-	private Joueur j2;
-	private boolean j1Connexion;
-	private boolean j2Connexion;
 	
 	public TicTacToeImpl() throws RemoteException {
 		super();
-		this.j1Connexion = false;
-		this.j2Connexion = false;
 	}
 
 	@Override
 	public boolean rejoindrePartie(Joueur j) throws RemoteException {	
-		if(this.j1Connexion && this.j2Connexion) {
-			System.out.println("La partie est pleine.");
-			return false;
-		}
-		else {
-			if(!this.j1Connexion) {
-				this.j1 = j;
-				this.j1Connexion = true;
-				
-			}
-			else {
-				this.j2 = j;
-				this.j2Connexion = true;
-			}
-			
-			System.out.println("Le joueur " + j.getPseudo() + " a rejoint la partie.");
-		}
+		
+		
+		System.out.println("Le joueur " + j.getPseudo() + " a rejoint la partie.");
 		
 		return true;
 	}
 
 	@Override
 	public boolean quitterPartie(Joueur j) throws RemoteException {
-		if(j.equals(this.j1)) {
-			this.j1Connexion = false;
-		}
-		else if(j.equals(this.j2)) {
-			this.j2Connexion = false;
-		}
-		else {
-			System.err.println("Ce joueur n'est pas dans la partie.");
-			return false;
-		}
-		
-		System.out.println("Le joueur " + j.getPseudo() + " a quitté la partie.");
+
 		return true;
 	}
 
 	@Override
-	public void lancerPartie() throws RemoteException {
+	public boolean lancerPartie() throws RemoteException {
 		System.out.println(this.j1Connexion);
 		if(this.j1Connexion == true && this.j2Connexion == true) {
 			this.jeu = new TicTacToe(j1, j2);
+			return true;
 		}
 		else {
-			System.out.println("Il n'y a pas assez de joueurs pour commencer la partie.");
+			return false;
 		}
-	}
-
-	@Override
-	public boolean ajouterSymbole(int ligne, int colonne) throws RemoteException {
-		return this.jeu.ajouterSymbole(ligne, colonne);
 	}
 
 	@Override
@@ -82,9 +47,12 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 	}
 
 	@Override
-	public void afficherGrille() throws RemoteException {
-		this.jeu.afficherGrille();
-		
+	public void afficherGrilleCmd() throws RemoteException {
+		this.jeu.afficherGrilleCmd();
+	}
+	
+	public char[][] getGrille() {
+		return this.jeu.getGrille();
 	}
 
 	@Override
@@ -103,12 +71,14 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 	}
 
 	@Override
-	public void setJoueurActuel(Joueur joueurActuel) throws RemoteException {
-		this.jeu.setJoueurActuel(joueurActuel);
+	public boolean insererSymbole(int ligne, int colonne) throws RemoteException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public char getSymbole() throws RemoteException {
-		return this.jeu.getSymbole();
+	public void setJoueurActuel(Joueur joueurActuel) throws RemoteException {
+		// TODO Auto-generated method stub
+		
 	}
 }

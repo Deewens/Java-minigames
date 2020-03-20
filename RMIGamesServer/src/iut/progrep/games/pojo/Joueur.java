@@ -1,13 +1,16 @@
 package iut.progrep.games.pojo;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class Joueur implements Serializable {
 	//private int id;
 	private String pseudo;
 	
 	public Joueur() {
-		this.pseudo = "Anonyme";
+		Random rand = new Random();
+		int randNumber = rand.nextInt(1000);
+		this.pseudo = "Anonyme_" + randNumber;
 	}
 	
 	public Joueur(String pseudo) {

@@ -1,6 +1,7 @@
 package iut.progrep.games.rmi;
 
 import java.rmi.Naming;
+import java.util.Scanner;
 
 import iut.progrep.games.pojo.Joueur;
 
@@ -20,8 +21,10 @@ public class Client {
 
 			TicTacToeInterface tictactoe = (TicTacToeInterface) Naming.lookup("rmi://localhost:" + port + "/tictactoe");
 			
-			Joueur j1 = new Joueur("Deewens");
-			tictactoe.rejoindrePartie(j1);
+			Joueur joueur = new Joueur("Sofiane");
+			tictactoe.rejoindrePartie(joueur);
+			Scanner sc = new Scanner(System.in);
+			sc.nextInt();
 		} catch(Exception e) {
 			System.out.println("Erreur lors de l'initialisation du client : " + e);
 			e.printStackTrace();

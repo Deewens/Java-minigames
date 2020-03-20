@@ -9,10 +9,11 @@ import iut.progrep.games.rmi.AllumettesInterface;
 import iut.progrep.games.rmi.TicTacToeInterface;
 
 public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInterface {
-	private Joueur j1;
-	private Joueur j2;
+	private JoueurAllumettes j1;
+	private JoueurAllumettes j2;
 	private boolean j1Connexion;
 	private boolean j2Connexion;
+	private Allumettes jeu;
 	
 	public AllumettesImpl() throws RemoteException {
 		this.j1Connexion = false;
@@ -55,5 +56,13 @@ public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInt
 		
 		System.out.println("Le joueur " + j.getPseudo() + " a quitt� la partie.");
 		return true;
+	}
+	
+	public void lancerPartie() throws RemoteException {
+		this.jeu = new Allumettes(this.j1, this.j2);
+	}
+	
+	public int getNbAllu() throws RemoteException {
+		return this.getNbAllu();
 	}
 }

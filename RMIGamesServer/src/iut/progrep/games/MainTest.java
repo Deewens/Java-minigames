@@ -3,14 +3,15 @@ package iut.progrep.games;
 import java.util.Scanner;
 
 import iut.progrep.games.pojo.Joueur;
+import iut.progrep.games.pojo.JoueurTicTacToe;
 
 public class MainTest {
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		
-		Joueur j1 = new Joueur();
-		Joueur j2 = new Joueur("Deewens");
+		JoueurTicTacToe j1 = new Joueur();
+		JoueurTicTacToe j2 = new Joueur("Deewens");
 		
 		TicTacToe jeu = new TicTacToe(j1, j2);
 		
@@ -34,7 +35,7 @@ public class MainTest {
 				}
 			} while(place == false);
 			
-			jeu.afficherGrille();
+			jeu.afficherGrilleCmd();
 			
 			if(jeu.verifGagnant()) {
 				System.out.println("Le joueur " + jeu.getJoueurActuel().getPseudo() + " a gagné ! Bravo !");
