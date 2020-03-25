@@ -8,10 +8,10 @@ import iut.progrep.games.pojo.JoueurTicTacToe;
 public class MainTest {
 
 	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+		/*Scanner sc = new Scanner(System.in);
 		
-		JoueurTicTacToe j1 = new Joueur();
-		JoueurTicTacToe j2 = new Joueur("Deewens");
+		JoueurTicTacToe j1 = new JoueurTicTacToe('Y');
+		JoueurTicTacToe j2 = new JoueurTicTacToe("Deewens", 'X');
 		
 		TicTacToe jeu = new TicTacToe(j1, j2);
 		
@@ -48,7 +48,7 @@ public class MainTest {
 				}
 				jeu.changerJoueur();
 			}
-		} while(true);
+		} while(true);*/
 	}
 
 }

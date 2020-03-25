@@ -21,8 +21,7 @@ public class Client {
 
 			TicTacToeInterface tictactoe = (TicTacToeInterface) Naming.lookup("rmi://localhost:" + port + "/tictactoe");
 			
-			Joueur joueur = new Joueur("Sofiane");
-			tictactoe.rejoindrePartie(joueur);
+
 			Scanner sc = new Scanner(System.in);
 			sc.nextInt();
 		} catch(Exception e) {

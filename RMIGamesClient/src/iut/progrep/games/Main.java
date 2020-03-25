@@ -25,6 +25,15 @@ public class Main extends Application {
 		TicTacToeController controller = fxmlLoader.getController();
 		primaryStage.setTitle("TicTacToe");
 		primaryStage.setScene(new Scene(root));
+		primaryStage.setOnCloseRequest(e -> controller.onShutdown());
+		/*primaryStage.setOnShowing(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent arg0) {
+				System.out.println("Ok.");
+				controller.onWindowShown();
+			}
+			
+		});*/
 		primaryStage.show();
 	}
 }
