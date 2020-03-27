@@ -4,8 +4,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-import iut.progrep.games.pojo.Joueur;
 import iut.progrep.games.pojo.JoueurTicTacToe;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 
 public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInterface {
 	private char[][] grille;
@@ -13,17 +17,27 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 	private ArrayList<JoueurTicTacToe> joueurs;
 	private boolean partieLance;
 	private static final int NOMBRE_JOUEURS = 2;
+	private boolean click;
+	private int ligneGUI;
+	private int colonneGUI;
+	private char symbole;
 	
 	public TicTacToeImpl() throws RemoteException {
 		super();
 		this.partieLance = false;
-		this.grille = new char[][] {{' ',' ',' '},{' ',' ',' '},{' ',' ',' '}};
 		this.joueurs = new ArrayList<>(NOMBRE_JOUEURS);
 	}
 
 	@Override
-	public void rejoindrePartie(JoueurTicTacToe j) throws RemoteException {
+	public boolean rejoindrePartie(JoueurTicTacToe j) throws RemoteException {
+		if(this.joueurs.size() > 0) {
+			if(this.joueurs.get(0).getSymbole() == j.getSymbole()) {
+				return false;
+			}
+		}
+		
 		this.joueurs.add(j);
+		return true;
 	}
 
 	@Override
@@ -42,7 +56,8 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 				e.printStackTrace();
 			}
 		}
- 
+		
+		this.grille = new char[][] {{' ',' ',' '},{' ',' ',' '},{' ',' ',' '}};
 		this.joueurActuel = this.joueurs.get(0);
 		System.out.println("TicTacToe initialisé.");
 		System.out.println("C'est à " + this.joueurActuel.getPseudo() + " de joué.");
@@ -53,8 +68,7 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 	@Override
 	public boolean insererSymbole(int ligne, int colonne) throws RemoteException {
 		if(this.grille[ligne][colonne] == ' ') {
-			this.grille[ligne][colonne] = this.joueurActuel.getSymbole();
-			this.changerJoueur();
+			this.grille[ligne][colonne] = symbole;
 			return true;
 		}
 		return false;
@@ -68,6 +82,8 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 		else {
 			this.joueurActuel = this.joueurs.get(0);
 		}
+		
+		this.symbole = this.joueurActuel.getSymbole();
 	}
 	
 	@Override
@@ -98,7 +114,6 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 		if(this.verifLigneGagnante() || this.verifColonneGagnante() || this.verifDiagonaleGagnante()) {
 			return true;
 		}
-		
 		return false;
 	}
 	
@@ -157,5 +172,29 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 
 	public void setPartieLance(boolean partieLance) throws RemoteException {
 		this.partieLance = partieLance;
+	}
+
+	public boolean isClick() {
+		return click;
+	}
+
+	public void setClick(boolean click) {
+		this.click = click;
+	}
+
+	public int getLigneGUI() {
+		return ligneGUI;
+	}
+
+	public void setLigneGUI(int ligneGUI) {
+		this.ligneGUI = ligneGUI;
+	}
+
+	public int getColonneGUI() {
+		return colonneGUI;
+	}
+
+	public void setColonneGUI(int colonneGUI) {
+		this.colonneGUI = colonneGUI;
 	}
 }

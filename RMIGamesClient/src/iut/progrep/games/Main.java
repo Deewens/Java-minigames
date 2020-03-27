@@ -19,21 +19,11 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		URL fxmlURL = getClass().getResource("views/tictactoe.fxml");
+		URL fxmlURL = getClass().getResource("views/accueil.fxml");
 		FXMLLoader fxmlLoader = new FXMLLoader(fxmlURL);
 		Parent root = (Parent) fxmlLoader.load();
-		TicTacToeController controller = fxmlLoader.getController();
-		primaryStage.setTitle("TicTacToe");
+		primaryStage.setTitle("Accueil");
 		primaryStage.setScene(new Scene(root));
-		primaryStage.setOnCloseRequest(e -> controller.onShutdown());
-		/*primaryStage.setOnShowing(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent arg0) {
-				System.out.println("Ok.");
-				controller.onWindowShown();
-			}
-			
-		});*/
 		primaryStage.show();
 	}
 }

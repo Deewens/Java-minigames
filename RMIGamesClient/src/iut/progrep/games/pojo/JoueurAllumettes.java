@@ -3,23 +3,23 @@ package iut.progrep.games.pojo;
 import java.io.Serializable;
 
 public class JoueurAllumettes extends Joueur implements Serializable {
-	private int joue;
+	private int compteurAllumettes;
 	
 	
-	public JoueurAllumettes() {
-		super();
+	public JoueurAllumettes(String pseudo) {
+		super(pseudo);
 	}
 
-	public JoueurAllumettes(int joue) {
-		super();
-		this.joue = joue;
+	public JoueurAllumettes(String pseudo, int compteurAllumettes) {
+		super(pseudo);
+		this.compteurAllumettes = compteurAllumettes;
 	}
 	
-	public int getJoue() {
-		return joue;
+	public int getCompteurAllumettes() {
+		return compteurAllumettes;
 	}
 
-	public void setJoue(int joue) {
-		this.joue = joue;
+	public void setCompteurAllumettes(int compteurAllumettes) {
+		this.compteurAllumettes = compteurAllumettes;
 	}	
 }

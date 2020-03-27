@@ -8,15 +8,18 @@ import java.util.ResourceBundle;
 
 import iut.progrep.games.pojo.JoueurTicTacToe;
 import iut.progrep.games.rmi.TicTacToeInterface;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -24,8 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 public class TicTacToeController implements Initializable {
 	@FXML private StackPane sp;
@@ -41,11 +43,15 @@ public class TicTacToeController implements Initializable {
 	@FXML private Pane case1_2;
 	@FXML private Pane case2_2;
 	
+	Label attenteMsg = new Label("En attente d'un autre joueur.");
+	
 	TicTacToeInterface tictactoe;
 	JoueurTicTacToe joueur;
+	
+	Stage pStage;
 
 	public TicTacToeController() {
-		this.joueur = new JoueurTicTacToe("Sofiane", 'O');
+		this.joueur = new JoueurTicTacToe("Sofiane", 'X');
 		
 		System.setProperty("java.security.policy","file:./policies/client.policy");
 		System.setProperty("java.rmi.server.codebase", "file:D:/Utilisateurs/razor/Documents/Etudes/IUT/2A/ProgRep/Projet/RMIGames/RMIGamesServer/bin");
@@ -53,6 +59,10 @@ public class TicTacToeController implements Initializable {
 		if(System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
+	}
+	
+	public void setParentStage(Stage pStage) {
+		this.pStage = pStage;
 	}
 	
 	@Override
@@ -68,74 +78,193 @@ public class TicTacToeController implements Initializable {
 		cases.add(case1_2);
 		cases.add(case2_2);
 		
-		System.out.println(cases.get(0).getWidth());
-		
 		try {
 			int port = 8000;
 
 			this.tictactoe = (TicTacToeInterface) Naming.lookup("rmi://localhost:" + port + "/tictactoe");
-			this.tictactoe.rejoindrePartie(joueur);
+			if(!this.tictactoe.rejoindrePartie(joueur)) {
+				this.joueur.setSymbole('O');
+				this.tictactoe.rejoindrePartie(joueur);
+			}
+			
 			this.initJeu();
 		} catch(Exception e) {
 			System.out.println("Erreur lors de l'initialisation du client : " + e);
 			e.printStackTrace();
 		}
 		
-		
 		cases.forEach((c) -> {
 			c.setOnMouseClicked(actionEvent -> {
-				System.out.println(GridPane.getColumnIndex(c) + " - " + GridPane.getRowIndex(c));
-				if(this.tictactoe.isPartieLance()) {
-					System.out.println("C'est à " + joueur.getPseudo() + " de jouer.");
-					try {
-						this.tictactoe.insererSymbole(GridPane.getRowIndex(c), GridPane.getColumnIndex(c));
-						this.tictactoe.afficherGrilleCmd();
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				System.out.println(GridPane.getColumnIndex(c) + " - " + GridPane.getRowIndex(c));	
+				try {
+					if(this.tictactoe.isPartieLance()) {
+						if(this.joueur.equals(this.tictactoe.getJoueurActuel())) {
+							tictactoe.setClick(true);
+							boolean insertion = tictactoe.insererSymbole(GridPane.getRowIndex(c), GridPane.getColumnIndex(c));
+							System.out.println(Boolean.toString(insertion));
+							if(insertion == false) {
+								Alert alert = new Alert(AlertType.ERROR);
+								alert.initOwner(pStage);
+								alert.setTitle("Erreur");
+								alert.setHeaderText("Impossible d'insérer dans cette case");
+								alert.setContentText("Cette case est déjà remplit.");
+								alert.showAndWait();
+							}
+							tictactoe.afficherGrilleCmd();
+						}
+						else {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.initOwner(pStage);
+							alert.setTitle("Erreur");
+							alert.setHeaderText("Vous ne pouvez pas jouer");
+							alert.setContentText("Ce n'est pas à votre tour de jouer !");
+							alert.showAndWait();
+						}
 					}
-					dessinerCase(c);
-				}
-				else {
-					System.out.println("La partie n'a pas débuté.");
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			});
 		});
+		
+		this.jeu();
 	}
 	
 	public void jeu() {
-		while(this.tictactoe.isPartieLance()) {
-			System.out.println("C'est à " + joueur.getPseudo() + " de jouer.");
-			//this.tictactoe.insererSymbole(ligne, colonne)
-		}
+		final Service<Void> jeu = new Service<Void>() {
+			@Override
+			protected Task<Void> createTask() {
+				// TODO Auto-generated method stub
+				return new Task<Void>() {
+					@Override
+					protected Void call() throws Exception {						
+						while(true) {
+							if(tictactoe.isPartieLance()) {
+								if(tictactoe.isClick()) {
+									System.out.println("Clické");
+									tictactoe.setClick(false);
+									
+									tictactoe.changerJoueur();
+
+									Platform.runLater(new Runnable() {
+										@Override
+										public void run() {
+											try {
+												char[][] grilleServeur = tictactoe.getGrille();
+												for(int i = 0; i<grilleServeur.length;i++) {
+													for(int j = 0; j<grilleServeur[i].length;j++) {
+														if(grilleServeur[i][j] == 'X') {
+															Pane p = (Pane) getNodeByRowColumnIndex(i, j, grille);
+															dessinerCase(p, 'X');
+														}
+														else if(grilleServeur[i][j] == 'O') {
+															Pane p = (Pane) getNodeByRowColumnIndex(i, j, grille);
+															dessinerCase(p, 'O');
+														}
+													}
+												}
+											} catch (RemoteException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+											
+										}
+										
+									});
+									
+									if(tictactoe.verifGagnant()) {
+										if(tictactoe.getJoueurActuel().equals(joueur)) {
+											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a gagné ! Bravo !");
+										}
+										else {
+											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a perdu ! Nul !");
+										}
+										
+										Platform.runLater(new Runnable() {
+
+											@Override
+											public void run() {
+												pStage.close();
+											}
+											
+										});
+									}
+									else {
+										if(tictactoe.verifGrilleNulle()) {
+											System.out.println("Egalité !");
+											
+											Platform.runLater(new Runnable() {
+
+												@Override
+												public void run() {
+													pStage.close();
+												}
+												
+											});
+											
+										}
+									}
+								}
+							}
+						}
+					}
+				};
+			}
+		};
+		
+		jeu.stateProperty().addListener((ObservableValue<? extends Worker.State> observableValue, Worker.State oldValue, Worker.State newValue) -> {
+            switch (newValue) {
+                case FAILED:
+                	System.out.println("Le service 'jeu' n'à pas réussit à se lancer.");
+                	jeu.getException().printStackTrace();
+                	break;
+                case CANCELLED:
+                case SUCCEEDED:
+                	System.out.println("Le service jeu a été lancé avec succès.");
+                	//System.out.println(lancerService.getValue());
+                    break;
+            }
+        });
+		
+		jeu.start();
+	}
+	
+	public Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+	    Node result = null;
+	    ObservableList<Node> childrens = gridPane.getChildren();
+
+	    for (Node node : childrens) {
+	        if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
+	            result = node;
+	            break;
+	        }
+	    }
+	    return result;
 	}
 
-	public void dessinerCase(Pane p) {
-		try {
-			if(this.tictactoe.getJoueurActuel().getSymbole() == 'O') {
-				Circle cercle = new Circle(0, 0, 50);
-				cercle.setFill(Color.TRANSPARENT);
-				cercle.setStroke(Color.BLACK);
-				cercle.setStrokeWidth(5);
-				cercle.setLayoutX(p.getWidth()/2);
-				System.out.println(p.getWidth());
-				cercle.setLayoutY(p.getHeight()/2);
-				p.getChildren().add(cercle);
-			}
-			else if(this.tictactoe.getJoueurActuel().getSymbole() == 'X') {
-				Line line1 = new Line(10, 10, 10, 10);
-				line1.endXProperty().bind(p.widthProperty().subtract(10));
-				line1.endYProperty().bind(p.heightProperty().subtract(10));
-				line1.setStrokeWidth(5);
-				
-				Line line2 = new Line(10, 10, 10, 10);
-				line2.startXProperty().bind(p.widthProperty().subtract(10));
-				line2.endYProperty().bind(p.heightProperty().subtract(10));
-				line2.setStrokeWidth(5);
-				p.getChildren().addAll(line1, line2);
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
+	public void dessinerCase(Pane p, char symbole) {
+		if(symbole == 'O') {
+			Circle cercle = new Circle(0, 0, 50);
+			cercle.setFill(Color.TRANSPARENT);
+			cercle.setStroke(Color.BLACK);
+			cercle.setStrokeWidth(5);
+			cercle.setLayoutX(p.getWidth()/2);
+			System.out.println(p.getWidth());
+			cercle.setLayoutY(p.getHeight()/2);
+			p.getChildren().add(cercle);
+		}
+		else if(symbole == 'X') {
+			Line line1 = new Line(10, 10, 10, 10);
+			line1.endXProperty().bind(p.widthProperty().subtract(10));
+			line1.endYProperty().bind(p.heightProperty().subtract(10));
+			line1.setStrokeWidth(5);
+			
+			Line line2 = new Line(10, 10, 10, 10);
+			line2.startXProperty().bind(p.widthProperty().subtract(10));
+			line2.endYProperty().bind(p.heightProperty().subtract(10));
+			line2.setStrokeWidth(5);
+			p.getChildren().addAll(line1, line2);
 		}
 	}
 	
@@ -147,7 +276,9 @@ public class TicTacToeController implements Initializable {
 				return new Task<Boolean>() {
 					@Override
 					protected Boolean call() throws Exception {
+						System.out.println("Avant lancer " + tictactoe.isPartieLance());
 						tictactoe.lancerPartie();
+						System.out.println("Après lancé " + tictactoe.isPartieLance());
 
 						return true;
 					}
@@ -161,6 +292,7 @@ public class TicTacToeController implements Initializable {
             switch (newValue) {
                 case FAILED:
                 	System.out.println("Le service a n'a pas réussit à se lancer.");
+                	lancerService.getException().printStackTrace();
                 	break;
                 case CANCELLED:
                 case SUCCEEDED:
@@ -179,18 +311,28 @@ public class TicTacToeController implements Initializable {
 				return new Task<Void>() {
 					@Override
 					protected Void call() throws Exception {
-						Label attenteMsg = new Label("En attente d'un autre joueur.");
-						while(!tictactoe.isPartieLance()) {
+						
+						while(tictactoe.isPartieLance() == false) {
 							if(!sp.getChildren().contains(attenteMsg)) {
 								sp.getChildren().add(attenteMsg);
 							}
 						}
-						if(tictactoe.isPartieLance()) {
-							if(sp.getChildren().contains(attenteMsg)) {
-								sp.getChildren().remove(attenteMsg);
-							}
-							
-						}
+						
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+								try {
+									if(tictactoe.isPartieLance() == true) {
+										System.out.println("Remove");
+										sp.getChildren().remove(attenteMsg);
+									}
+								} catch (RemoteException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						    }
+						});
+
 						return null;
 					}
 					
@@ -207,6 +349,12 @@ public class TicTacToeController implements Initializable {
                 	break;
                 case CANCELLED:
                 case SUCCEEDED:
+				try {
+					System.out.println(this.tictactoe.isPartieLance());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 	System.out.println("Le service init s'est effectué correctement.");
                     break;
             }

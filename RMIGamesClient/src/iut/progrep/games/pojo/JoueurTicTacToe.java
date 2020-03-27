@@ -2,10 +2,9 @@ package iut.progrep.games.pojo;
 
 public class JoueurTicTacToe extends Joueur {
 	private char symbole;
-	
-	public JoueurTicTacToe(char symbole) {
-		super();
-		this.symbole = symbole;
+
+	public JoueurTicTacToe(String pseudo) {
+		super(pseudo);
 	}
 	
 	public JoueurTicTacToe(String pseudo, char symbole) {
@@ -15,5 +14,9 @@ public class JoueurTicTacToe extends Joueur {
 
 	public char getSymbole() {
 		return this.symbole;
+	}
+	
+	public void setSymbole(char symbole) {
+		this.symbole = symbole;
 	}
 }

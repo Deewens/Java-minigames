@@ -1,9 +1,10 @@
-package iut.progrep.games;
+package iut.progrep.games.rmi;
 
 import java.awt.Graphics;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import iut.progrep.games.Allumettes;
 import iut.progrep.games.pojo.Joueur;
 import iut.progrep.games.pojo.JoueurAllumettes;
 import iut.progrep.games.rmi.AllumettesInterface;

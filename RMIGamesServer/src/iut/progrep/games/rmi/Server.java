@@ -22,6 +22,7 @@ public class Server {
 			
 			// rmi://localhost:port/nomService
 			Naming.rebind("rmi://localhost:" + port + "/tictactoe", new TicTacToeImpl()); // Naming rebind: exporte un service
+			Naming.rebind("rmi://localhost:" + port + "/allumette", new AllumettesImpl());
 			System.out.println("Le serveur est prêt !");
 		} catch(Exception e) {
 			System.out.println("Echec de l'intialisation du serveur : " + e);
