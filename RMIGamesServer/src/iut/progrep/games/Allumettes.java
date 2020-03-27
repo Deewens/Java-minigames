@@ -71,16 +71,12 @@ public class Allumettes  {
 	}
 	
 	public String estGagnant() {
-		  if(nbAllumettesRestantes == 0 && j1.getCompteurAllumettes() % 2 == 1) {
+		  if(j1.getCompteurAllumettes() % 2 == 1) {
 		    String gagnant = j1.getPseudo()+ "a gagné" ;
 		    return gagnant;
 		  } else {String gagnant = "L'ordinateur a gagné" ;
 		  return gagnant;
 		  }
-		  
-
-		
-		  
 		}
 	
 

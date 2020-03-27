@@ -82,24 +82,29 @@ public class TicTacToeController implements Initializable {
 			int port = 8000;
 
 			this.tictactoe = (TicTacToeInterface) Naming.lookup("rmi://localhost:" + port + "/tictactoe");
-			if(!this.tictactoe.rejoindrePartie(joueur)) {
-				this.joueur.setSymbole('O');
-				this.tictactoe.rejoindrePartie(joueur);
-			}
-			
-			this.initJeu();
 		} catch(Exception e) {
 			System.out.println("Erreur lors de l'initialisation du client : " + e);
 			e.printStackTrace();
 		}
+		
+		try {
+			if(!this.tictactoe.rejoindrePartie(joueur)) {
+				this.joueur.setSymbole('O');
+				this.tictactoe.rejoindrePartie(joueur);
+			}
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		this.initJeu();
 		
 		cases.forEach((c) -> {
 			c.setOnMouseClicked(actionEvent -> {
 				System.out.println(GridPane.getColumnIndex(c) + " - " + GridPane.getRowIndex(c));	
 				try {
 					if(this.tictactoe.isPartieLance()) {
-						if(this.joueur.equals(this.tictactoe.getJoueurActuel())) {
-							tictactoe.setClick(true);
+						if(this.joueur.getSymbole() == this.tictactoe.getJoueurActuel().getSymbole()) {
 							boolean insertion = tictactoe.insererSymbole(GridPane.getRowIndex(c), GridPane.getColumnIndex(c));
 							System.out.println(Boolean.toString(insertion));
 							if(insertion == false) {
@@ -110,7 +115,11 @@ public class TicTacToeController implements Initializable {
 								alert.setContentText("Cette case est déjà remplit.");
 								alert.showAndWait();
 							}
-							tictactoe.afficherGrilleCmd();
+							else {
+								tictactoe.setClick(true);
+								tictactoe.afficherGrilleCmd();
+								tictactoe.changerJoueur();
+							}
 						}
 						else {
 							Alert alert = new Alert(AlertType.ERROR);
@@ -144,8 +153,6 @@ public class TicTacToeController implements Initializable {
 								if(tictactoe.isClick()) {
 									System.out.println("Clické");
 									tictactoe.setClick(false);
-									
-									tictactoe.changerJoueur();
 
 									Platform.runLater(new Runnable() {
 										@Override
@@ -158,7 +165,8 @@ public class TicTacToeController implements Initializable {
 															Pane p = (Pane) getNodeByRowColumnIndex(i, j, grille);
 															dessinerCase(p, 'X');
 														}
-														else if(grilleServeur[i][j] == 'O') {
+														
+														if(grilleServeur[i][j] == 'O') {
 															Pane p = (Pane) getNodeByRowColumnIndex(i, j, grille);
 															dessinerCase(p, 'O');
 														}
@@ -174,21 +182,41 @@ public class TicTacToeController implements Initializable {
 									});
 									
 									if(tictactoe.verifGagnant()) {
-										if(tictactoe.getJoueurActuel().equals(joueur)) {
+										if(tictactoe.getJoueurActuel().getSymbole() == joueur.getSymbole()) {
 											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a gagné ! Bravo !");
+											Platform.runLater(new Runnable() {
+
+												@Override
+												public void run() {
+													Alert alert = new Alert(AlertType.INFORMATION);
+													alert.initOwner(pStage);
+													alert.setTitle("Fin du jeu");
+													alert.setHeaderText("La partie est terminé");
+													alert.setContentText("Félicitation ! Vous avez gagné !");
+													alert.showAndWait();
+													pStage.close();
+												}
+												
+											});
+
 										}
 										else {
 											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a perdu ! Nul !");
-										}
-										
-										Platform.runLater(new Runnable() {
+											Platform.runLater(new Runnable() {
 
-											@Override
-											public void run() {
-												pStage.close();
-											}
-											
-										});
+												@Override
+												public void run() {
+													Alert alert = new Alert(AlertType.INFORMATION);
+													alert.initOwner(pStage);
+													alert.setTitle("Fin du jeu");
+													alert.setHeaderText("La partie est terminé");
+													alert.setContentText("Malheureusement, vous avez perdu !");
+													alert.showAndWait();
+													pStage.close();
+												}
+												
+											});
+										}
 									}
 									else {
 										if(tictactoe.verifGrilleNulle()) {
@@ -198,6 +226,12 @@ public class TicTacToeController implements Initializable {
 
 												@Override
 												public void run() {
+													Alert alert = new Alert(AlertType.INFORMATION);
+													alert.initOwner(pStage);
+													alert.setTitle("Fin du jeu");
+													alert.setHeaderText("La partie est terminé");
+													alert.setContentText("Egalité !");
+													alert.showAndWait();
 													pStage.close();
 												}
 												

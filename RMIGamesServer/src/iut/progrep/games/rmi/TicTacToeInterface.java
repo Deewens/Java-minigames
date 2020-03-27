@@ -12,6 +12,7 @@ public interface TicTacToeInterface extends Remote {
 	public boolean rejoindrePartie(JoueurTicTacToe j) throws RemoteException;
 	public void quitterPartie(JoueurTicTacToe j) throws RemoteException;
 	public void lancerPartie() throws RemoteException;
+	public void init() throws RemoteException;
 
 	public boolean insererSymbole(int ligne, int colonne) throws RemoteException;
 	public void changerJoueur() throws RemoteException;
