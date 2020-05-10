@@ -22,6 +22,7 @@ public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInt
 
 	@Override
 	public boolean rejoindrePartie(JoueurAllumettes j) throws RemoteException {	
+		//l'unique joueur rejoint la partie
 		if(this.j1Connexion ) {
 			System.out.println("La partie est pleine.");
 			return false;
@@ -41,6 +42,7 @@ public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInt
 
 	@Override
 	public boolean quitterPartie(JoueurAllumettes j) throws RemoteException {
+		// l'unique joueur quitte la partie lorsqu'elle est terminé
 		if(j.equals(this.j1)) {
 			this.j1Connexion = false;
 		}
@@ -55,6 +57,7 @@ public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInt
 
 	@Override
 	public void lancerPartie() throws RemoteException {
+		// des que l'unique joueur a rejoint, la partie peut commencer
 		System.out.println(this.j1Connexion);
 		if(this.j1Connexion == true ) {
 			this.jeux = new Allumettes(j1);
@@ -67,11 +70,11 @@ public class AllumettesImpl extends UnicastRemoteObject implements AllumettesInt
 	
 
 	
-
+		/*  implémentation des methodes de l'interface*/
 	
 
 	@Override
-	public void jeuAllu(int allu) throws RemoteException {
+	public void jeuAllu(int allu) throws RemoteException { 
 		this.jeux.jeuAllu(allu);		
 	}
 

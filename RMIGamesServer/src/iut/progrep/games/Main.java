@@ -1,11 +1,13 @@
-package iut.progrep.games.rmi;
+package iut.progrep.games;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
+
+import iut.progrep.games.rmi.AllumettesImpl;
+import iut.progrep.games.rmi.TicTacToeImpl;
 
 
-public class Server {
+public class Main {
 	public static void main(String[] args) {
 		System.setProperty("java.security.policy","file:./policies/serveur.policy");
 		
@@ -19,8 +21,6 @@ public class Server {
 			
 			LocateRegistry.createRegistry(port); // Active le service de nommage
 			
-			
-			// rmi://localhost:port/nomService
 			Naming.rebind("rmi://localhost:" + port + "/tictactoe", new TicTacToeImpl()); // Naming rebind: exporte un service
 			Naming.rebind("rmi://localhost:" + port + "/allumette", new AllumettesImpl());
 			System.out.println("Le serveur est prêt !");

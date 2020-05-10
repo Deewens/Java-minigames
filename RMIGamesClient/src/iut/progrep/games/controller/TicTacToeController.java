@@ -67,6 +67,7 @@ public class TicTacToeController implements Initializable {
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		// Insertion de chaque cases dans une observableList afin de lui assigner un Listener
 		this.cases = FXCollections.observableList(new ArrayList<>());
 		cases.add(case0_0);
 		cases.add(case1_0);
@@ -87,6 +88,8 @@ public class TicTacToeController implements Initializable {
 			e.printStackTrace();
 		}
 		
+		
+		// Si le joueur ne peut rejoindre la partie avec le premier symbole, on change son symboel et on réessaie. (Ce qui veut dire que le symbole était déjà utilisé)
 		try {
 			if(!this.tictactoe.rejoindrePartie(joueur)) {
 				this.joueur.setSymbole('O');
@@ -97,17 +100,19 @@ public class TicTacToeController implements Initializable {
 			e1.printStackTrace();
 		}
 		
+		// On initialise le jeu en lancant des threads.
 		this.initJeu();
 		
+		// Algorithme du jeu qui se lance dès qu'un client clique sur une case, ajout d'un listener sur l'observableList
 		cases.forEach((c) -> {
 			c.setOnMouseClicked(actionEvent -> {
 				System.out.println(GridPane.getColumnIndex(c) + " - " + GridPane.getRowIndex(c));	
 				try {
 					if(this.tictactoe.isPartieLance()) {
-						if(this.joueur.getSymbole() == this.tictactoe.getJoueurActuel().getSymbole()) {
+						if(this.joueur.getSymbole() == this.tictactoe.getJoueurActuel().getSymbole()) { // On vérifie si c'est au tour du client de jouer
 							boolean insertion = tictactoe.insererSymbole(GridPane.getRowIndex(c), GridPane.getColumnIndex(c));
 							System.out.println(Boolean.toString(insertion));
-							if(insertion == false) {
+							if(insertion == false) { // La case est déjà remplit
 								Alert alert = new Alert(AlertType.ERROR);
 								alert.initOwner(pStage);
 								alert.setTitle("Erreur");
@@ -115,13 +120,13 @@ public class TicTacToeController implements Initializable {
 								alert.setContentText("Cette case est déjà remplit.");
 								alert.showAndWait();
 							}
-							else {
-								tictactoe.setClick(true);
-								tictactoe.afficherGrilleCmd();
-								tictactoe.changerJoueur();
+							else { // La case peut se remplir
+								tictactoe.setClick(true); // On considère donc que le client à cliqué, ce qui permet d'effectuer la suite du jeu dans la boucle infini du thread "jeu" à la ligne 150
+								tictactoe.afficherGrilleCmd(); // Affiche la grille dans la ligen de commande pour vérifier
+								tictactoe.changerJoueur(); // Comme le joueur vient de jouer, on change le tour pour passer à l'autre
 							}
 						}
-						else {
+						else { // Si ce n'est pas au tour du client, message d'erreur
 							Alert alert = new Alert(AlertType.ERROR);
 							alert.initOwner(pStage);
 							alert.setTitle("Erreur");
@@ -137,6 +142,8 @@ public class TicTacToeController implements Initializable {
 			});
 		});
 		
+		// Lancement du thread qui s'occupe d'effectuer l'algorithme du jeu en fonction du retour des fonctions faites dans le Listener
+		// un "Listener artificiel"
 		this.jeu();
 	}
 	
@@ -148,12 +155,16 @@ public class TicTacToeController implements Initializable {
 				return new Task<Void>() {
 					@Override
 					protected Void call() throws Exception {						
-						while(true) {
-							if(tictactoe.isPartieLance()) {
-								if(tictactoe.isClick()) {
+						while(true) { // boucle infini vérifiant continuellement si le joueur a cliqué pour pouvoir syncroniser les deux interfaces dans ce cas
+							if(tictactoe.isPartieLance()) { // On effectue la suite seulement si la partie est lancé
+								if(tictactoe.isClick()) { // Si le joueur a cliqué, on peut effectuer la suite
 									System.out.println("Clické");
-									tictactoe.setClick(false);
+									tictactoe.setClick(false); // On peut remettre false au boolean "click" du serveur
 
+									/*
+									 *  Cette partie de code récupère l'array à deux dimensions qui a été mis à jour dans le serveur 
+									 *  pour ensuite mettre à jour l'interface des deux clients en fonction de cet Array
+									 */
 									Platform.runLater(new Runnable() {
 										@Override
 										public void run() {
@@ -181,8 +192,8 @@ public class TicTacToeController implements Initializable {
 										
 									});
 									
-									if(tictactoe.verifGagnant()) {
-										if(tictactoe.getJoueurActuel().getSymbole() == joueur.getSymbole()) {
+									if(tictactoe.verifGagnant()) { // Ensuite, on vérifie s'il y a un gagnant
+										if(tictactoe.getJoueurActuel().getSymbole() == joueur.getSymbole()) { // Si ce client est le joueur gagnant, on affiche qu'il a gagné
 											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a gagné ! Bravo !");
 											Platform.runLater(new Runnable() {
 
@@ -201,7 +212,7 @@ public class TicTacToeController implements Initializable {
 
 										}
 										else {
-											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a perdu ! Nul !");
+											System.out.println("Le joueur " + tictactoe.getJoueurActuel().getPseudo() + " a perdu ! Nul !"); // Si ce client est le joueur perdant, on affiche qu'il a perdu
 											Platform.runLater(new Runnable() {
 
 												@Override
@@ -218,8 +229,8 @@ public class TicTacToeController implements Initializable {
 											});
 										}
 									}
-									else {
-										if(tictactoe.verifGrilleNulle()) {
+									else { // Si onb ne trouve pas de gangant, on vérifie s'il y a égalité
+										if(tictactoe.verifGrilleNulle()) { // Si c'est le cas, on affiche un message affichant égalité pour les deux clients
 											System.out.println("Egalité !");
 											
 											Platform.runLater(new Runnable() {
@@ -261,10 +272,11 @@ public class TicTacToeController implements Initializable {
             }
         });
 		
+		// Lancement du thread
 		jeu.start();
 	}
 	
-	public Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+	public Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) { // Permet de récuperer l'enfant contenu dans l'une des cases du GridPane
 	    Node result = null;
 	    ObservableList<Node> childrens = gridPane.getChildren();
 
@@ -277,7 +289,7 @@ public class TicTacToeController implements Initializable {
 	    return result;
 	}
 
-	public void dessinerCase(Pane p, char symbole) {
+	public void dessinerCase(Pane p, char symbole) { // Dessine simplement dans l'interface graphique le symbole sur le Pane identifié
 		if(symbole == 'O') {
 			Circle cercle = new Circle(0, 0, 50);
 			cercle.setFill(Color.TRANSPARENT);
@@ -303,18 +315,19 @@ public class TicTacToeController implements Initializable {
 	}
 	
 	public void initJeu() {
-		final Service<Boolean> lancerService = new Service<Boolean>() {
+		
+		// Thread qui lance la partie
+		final Service<Void> lancerService = new Service<Void>() {
 			@Override
-			protected Task<Boolean> createTask() {
+			protected Task<Void> createTask() {
 				// TODO Auto-generated method stub
-				return new Task<Boolean>() {
+				return new Task<Void>() {
 					@Override
-					protected Boolean call() throws Exception {
-						System.out.println("Avant lancer " + tictactoe.isPartieLance());
+					protected Void call() throws Exception {
+						// Fonction bloquante qui ne lancera pas la partie tant que les joueurs ne seront pas deux.
 						tictactoe.lancerPartie();
-						System.out.println("Après lancé " + tictactoe.isPartieLance());
 
-						return true;
+						return null;
 					}
 					
 				};
@@ -336,8 +349,11 @@ public class TicTacToeController implements Initializable {
             }
         });
 		
+		// Démarrage du thread
 		lancerService.start();
 		
+		
+		// Thread qui s'occupe d'afficher le message "En attente d'un autre joueur" tant que la partie n'est pas lancé
 		final Service<Void> init = new Service<Void>() {
 			@Override
 			protected Task<Void> createTask() {
@@ -346,18 +362,20 @@ public class TicTacToeController implements Initializable {
 					@Override
 					protected Void call() throws Exception {
 						
+						// tant que la partie n'est pas lancé, on affiche le message
 						while(tictactoe.isPartieLance() == false) {
 							if(!sp.getChildren().contains(attenteMsg)) {
 								sp.getChildren().add(attenteMsg);
 							}
 						}
 						
+						// Dès que la partie se lance, on sort de la boucle et on effectue le code en dessous
+						
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
 								try {
-									if(tictactoe.isPartieLance() == true) {
-										System.out.println("Remove");
+									if(tictactoe.isPartieLance() == true) { // La partie est lancé, on enlève le message d'attente
 										sp.getChildren().remove(attenteMsg);
 									}
 								} catch (RemoteException e) {
@@ -393,13 +411,15 @@ public class TicTacToeController implements Initializable {
                     break;
             }
         });
+		// Démarrage du thread
 		init.start();
 	}
 	
+	// Dès qu'un des clients ferme la fenêtre du jeu, on considère qu'il a quitté, cet évènement est appelé dans "AccueilController"
 	public void onShutdown() {
 		try {
 			System.out.println(joueur.getPseudo() + " a quitté la partie.");
-			this.tictactoe.quitterPartie(joueur);
+			this.tictactoe.quitterPartie(joueur); // Si un joueur quitte, on considère que la partie n'est plus lancé
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

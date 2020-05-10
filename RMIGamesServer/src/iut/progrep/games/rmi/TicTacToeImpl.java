@@ -27,11 +27,6 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 		this.joueurs = new ArrayList<>(NOMBRE_JOUEURS);
 		this.grille = new char[][] {{' ',' ',' '},{' ',' ',' '},{' ',' ',' '}};
 	}
-	
-	@Override
-	public void init() {
-		// Buggué
-	}
 
 	@Override
 	public boolean rejoindrePartie(JoueurTicTacToe j) throws RemoteException {
@@ -61,7 +56,6 @@ public class TicTacToeImpl extends UnicastRemoteObject implements TicTacToeInter
 				e.printStackTrace();
 			}
 		}
-		
 		
 		this.joueurActuel = this.joueurs.get(0);
 		System.out.println("TicTacToe initialisé.");

@@ -8,12 +8,13 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Allumettes  {
-	private	String joueurquicommence;
-	public int compt_ordi;
-	private JoueurAllumettes j1;
-	public int nbAllumettesRestantes;
+	private	String joueurquicommence; // variable qui initialise le joueur de départ
+	public int compt_ordi; // entier qui correspond au nombre d'allumette retirer par l'ordi
+	private JoueurAllumettes j1; 
+	public int nbAllumettesRestantes; //nombre d'allumette total restante dans le jeu
 	
-	public Allumettes(JoueurAllumettes j1) {
+	public Allumettes(JoueurAllumettes j1) { 
+		// initialise les variables , génere un joueur qui débute
 		this.j1 = j1;
 		this.nbAllumettesRestantes = this.nb_allumette();
 		int Min = 1;
@@ -28,7 +29,7 @@ public class Allumettes  {
 		
 	}
 	
-	private int nb_allumette() {
+	private int nb_allumette() { // génére un nombre impair d'allumette total entre 10 et 20
 		 int Min = 10;
 		 int Max = 20;
 		 int n=0;
@@ -37,12 +38,13 @@ public class Allumettes  {
 		}while(n % 2  == 0);
 		return n;}
 	
-	public void jeuAllu(int allu) {
+	public void jeuAllu(int allu) { //actualise le nombre d'allumette retirer par le joueur
 		j1.setCompteurAllumettes(j1.getCompteurAllumettes() + allu);
 		}
 	
 	
 	public void actualiserAlluRestantes(int allu) {
+		// actualise le nombre d'allumette total par rapport a ceux retiré par le joueur et l'ordinateur
 			
 			nbAllumettesRestantes=nbAllumettesRestantes-allu;
 			
@@ -58,19 +60,21 @@ public class Allumettes  {
 	 */
 	
 	public boolean verifGagnant(int compt) {
-		
+		// si y a plus d'allumette et le compteur du joueur est impair
 		if((nbAllumettesRestantes == 0) && (j1.getCompteurAllumettes() % 2  == 1) ) {
 			
 			return true;
 		
 		}else if((nbAllumettesRestantes == 0)&& (compt % 2  == 1)  ) {
-			
+			// si y a plus d'allumette et le compteur de l'ordi est impair
+
 			return true;
 		
 		}else  return false;
 	}
 	
-	public String estGagnant() {
+	public String estGagnant() { // retourne le gagnant du jeu
+		
 		  if(j1.getCompteurAllumettes() % 2 == 1) {
 		    String gagnant = j1.getPseudo()+ "a gagné" ;
 		    return gagnant;
