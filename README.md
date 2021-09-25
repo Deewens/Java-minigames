@@ -4,6 +4,8 @@ Play online at the famous Tic Tac Toe and Nim game with this Java software using
 * https://en.wikipedia.org/wiki/Tic-tac-toe
 * https://en.wikipedia.org/wiki/Nim
 
+The software has been written using the Java Remote Method Invocation (RMI) for the online client/server system and JavaFX for the GUI.
+
 ## Tic Tac Toe:
 
 A simple Tic Tac Toe online game working with Java RMI. You can play with your friends remotely.  
